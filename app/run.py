@@ -67,6 +67,14 @@ def index():
     genre_counts = df.groupby('genre').count()['message']
     genre_names = list(genre_counts.index)
     
+    # get category by count
+    cat_counts = df.drop(['id', 'message', 'original', 'genre'], axis=1).sum().sort_values(ascending=False)
+    cat_names = list(cat_counts.index)
+    
+    # get category and genre percentages
+    genre_perc = round(100*genre_counts/genre_counts.sum(), 1)
+    cat_perc = round(100*cat_counts/cat_counts.sum(), 1)
+    
     # create visuals
     # TODO: Below is an example - modify to create your own visuals
     graphs = [
@@ -87,7 +95,59 @@ def index():
                     'title': "Genre"
                 }
             }
+        },
+        
+        {
+            "data": [
+              {
+                "type": "pie",
+                "hole": 0.2,
+                "name": "Genre",
+                "pull": 0,
+                "domain": {
+                  "x": genre_perc,
+                  "y": genre_names
+                },
+                "marker": {
+                  "colors": [
+                    "#8b0000",
+                    "#006400",
+                    "#000080"
+                   ]
+                },
+                "textinfo": "label+value",
+                "hoverinfo": "all",
+                "labels": genre_names,
+                "values": genre_perc
+              }
+            ],
+            "layout": {
+              "title": "Genre Percentage Distribution"
+            }
+        },
+        
+        {
+            "data": [
+              {
+                "type": "bar",
+                "x": cat_names,
+                "y": cat_perc,
+                "marker": {
+                  "color": 'blue'}
+                }
+            ],
+            "layout": {
+              "title": "Message Distribution by Category",
+              'yaxis': {
+                  'title': "Percentage(%)"
+              },
+              'xaxis': {
+                  'title': "Category"
+              },
+              'barmode': 'group'
+            }
         }
+        
     ]
     
     # encode plotly graphs in JSON
